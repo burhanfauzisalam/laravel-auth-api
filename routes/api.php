@@ -12,9 +12,14 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/ulogin',     [AuthController::class, 'ulogin']);
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['check.jwt'])->group(function () {
     Route::get('/cek-token',     [AuthController::class, 'cekToken']);
     Route::get('/me',     [AuthController::class, 'me']);
     Route::post('/logout',[AuthController::class, 'logout']);
     Route::post('/refresh',[AuthController::class, 'refresh']);
 });
+
+// Route::middleware(['check.jwt'])->group(function () {
+//     Route::get('/profile', [UserController::class, 'profile']);
+//     Route::get('/cek-token', [AuthController::class, 'cekToken']);
+// });
