@@ -25,16 +25,22 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        
+
+        // Set masa berlaku token 30 hari (43200 menit)
+        JWTAuth::factory()->setTTL(43200);
         $token = JWTAuth::fromUser($user);
-        
+
         UserToken::create([
             'user_id' => $user->id,
-            'token'     => $token,
+            'token'   => $token,
         ]);
-        
-        return response()->json(['user' => $user, 'token' => $token], 201);
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token
+        ], 201);
     }
+
 
     public function login(Request $request)
     {
@@ -78,13 +84,32 @@ class AuthController extends Controller
 
     public function cekToken()
     {
-        $expires = auth()->factory()->getTTL() * 60;
+        $user = auth()->user();
+        $payload = auth()->payload();
+        
+        // Ambil waktu expired dari payload (dalam timestamp UNIX)
+        $exp = $payload->get('exp');
+        $now = now()->timestamp;
+
+        // Hitung sisa waktu dalam detik
+        $remainingSeconds = $exp - $now;
+
+        // Konversi ke menit, jam, hari
+        $remainingMinutes = round($remainingSeconds / 60, 2);
+        $remainingHours   = round($remainingSeconds / 3600, 2);
+        $remainingDays    = round($remainingSeconds / 86400, 2);
 
         return response()->json([
-            'user'      => auth()->user(),
-            'expired_in' => $expires,
+            'user' => $user,
+            'expired_in' => [
+                'seconds' => $remainingSeconds,
+                'minutes' => $remainingMinutes,
+                'hours'   => $remainingHours,
+                'days'    => $remainingDays
+            ]
         ]);
     }
+
 
     public function me()
     {
