@@ -127,6 +127,30 @@ class AuthController extends Controller
         return $this->respondWithToken(auth()->refresh());
     }
 
+    public function extendedToken()
+    {
+        $user = auth()->user();
+        // Simpan TTL saat ini
+        $defaultTTL = auth()->factory()->getTTL();
+
+        // Set TTL ke 30 hari (43200 menit)
+        auth()->factory()->setTTL(43200);
+
+        // Buat token baru dari user yang sedang login
+        $token = auth()->login(auth()->user());
+
+        // Kembalikan TTL ke nilai semula agar tidak mempengaruhi token lain
+        auth()->factory()->setTTL($defaultTTL);
+
+        // Update atau buat token baru di tabel user_tokens
+        UserToken::updateOrCreate(
+            ['user_id' => $user->id],
+            ['token' => $token]
+        );
+
+        return $this->respondWithToken($token);
+    }
+
     protected function respondWithToken($token)
     {
         return response()->json([
