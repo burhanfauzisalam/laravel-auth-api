@@ -31,6 +31,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         UserToken::create([
+            'token_id' => 5,
             'user_id' => $user->id,
             'token'   => $token,
         ]);
@@ -69,7 +70,7 @@ class AuthController extends Controller
         }
 
         // Ambil token dari tabel user_tokens
-        $userToken = UserToken::where('user_id', $user->id)->first();
+        $userToken = UserToken::where('user_id', $user->id)->where('token_id', 5)->first();
 
         // Jika belum ada token untuk user ini
         if (!$userToken) {
@@ -144,11 +145,18 @@ class AuthController extends Controller
 
         // Update atau buat token baru di tabel user_tokens
         UserToken::updateOrCreate(
-            ['user_id' => $user->id],
+            [
+                'token_id' => 5,
+                'user_id' => $user->id
+            ],
             ['token' => $token]
         );
-
-        return $this->respondWithToken($token);
+        
+        return response()->json([
+            // 'user' => $user,
+            'token' => $token
+        ], 200);
+        // return $this->respondWithToken($token);
     }
 
     protected function respondWithToken($token)

@@ -2,22 +2,25 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Mtoken;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $durations = [
+            60,        // 1 jam
+            1440,      // 24 jam
+            4320,      // 3 hari
+            10080,     // 7 hari
+            43200,     // 30 hari
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        foreach ($durations as $duration) {
+            Mtoken::create([
+                'duration' => $duration,
+            ]);
+        }
     }
 }
