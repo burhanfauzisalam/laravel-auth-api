@@ -15,12 +15,7 @@ Route::post('/ulogin',     [AuthController::class, 'ulogin']);
 Route::middleware(['check.jwt'])->group(function () {
     Route::get('/cek-token',     [AuthController::class, 'cekToken']);
     Route::get('/me',     [AuthController::class, 'me']);
-    Route::post('/logout',[AuthController::class, 'logout']);
-    Route::post('/refresh',[AuthController::class, 'refresh']);
-    Route::post('/extend',[AuthController::class, 'extendedToken']);
+    Route::get('/logout',[AuthController::class, 'logout']);
+    Route::get('/refresh',[AuthController::class, 'refresh']);
+    Route::get('/extend',[AuthController::class, 'extendedToken']);
 });
-
-// Route::middleware(['check.jwt'])->group(function () {
-//     Route::get('/profile', [UserController::class, 'profile']);
-//     Route::get('/cek-token', [AuthController::class, 'cekToken']);
-// });
