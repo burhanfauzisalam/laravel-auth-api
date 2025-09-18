@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\UserToken;
+use App\Models\Mtoken;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -70,7 +71,7 @@ class AuthController extends Controller
         }
 
         // Ambil token dari tabel user_tokens
-        $userToken = UserToken::where('user_id', $user->id)->where('token_id', 5)->first();
+        $userToken = UserToken::where('user_id', $user->id)->where('token_id', $user->status)->first();
 
         // Jika belum ada token untuk user ini
         if (!$userToken) {
@@ -151,6 +152,44 @@ class AuthController extends Controller
             ],
             ['token' => $token]
         );
+        
+        return response()->json([
+            // 'user' => $user,
+            'token' => $token
+        ], 200);
+        // return $this->respondWithToken($token);
+    }
+
+    public function generateToken(Request $request)
+    {
+        $user = auth()->user();
+        // Simpan TTL saat ini
+        $defaultTTL = auth()->factory()->getTTL();
+
+        $ttl = Mtoken::where('id', $request->level)->first();
+        // Set TTL ke 30 hari (43200 menit)
+        auth()->factory()->setTTL($ttl->duration);
+
+        // Buat token baru dari user yang sedang login
+        $token = auth()->login(auth()->user());
+
+        // Kembalikan TTL ke nilai semula agar tidak mempengaruhi token lain
+        auth()->factory()->setTTL($defaultTTL);
+
+        // dd($request->level);
+
+        // Update atau buat token baru di tabel user_tokens
+        UserToken::updateOrCreate(
+            [
+                'token_id' => (int)$request->level,
+                'user_id' => (int)$user->id
+            ],
+            ['token' => $token]
+        );
+
+        User::where('id', $user->id)
+                ->update(['status' => (int)$request->level]);
+
         
         return response()->json([
             // 'user' => $user,

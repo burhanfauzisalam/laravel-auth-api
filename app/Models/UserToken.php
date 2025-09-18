@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class UserToken extends Model
 {
     protected $table = 'user_token';
-    protected $fillable = ['user_id', 'token'];
+    protected $fillable = ['token_id','user_id', 'token'];
 }

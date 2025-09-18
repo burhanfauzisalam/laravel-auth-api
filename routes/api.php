@@ -18,4 +18,5 @@ Route::middleware(['check.jwt'])->group(function () {
     Route::get('/logout',[AuthController::class, 'logout']);
     Route::get('/refresh',[AuthController::class, 'refresh']);
     Route::get('/extend',[AuthController::class, 'extendedToken']);
+    Route::post('/generate',[AuthController::class, 'generateToken']); //level=>Mtoken->id
 });
